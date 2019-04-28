@@ -44,12 +44,18 @@ public class ConfigController {
     private HttpServletRequest request;
 
     @RequestMapping(value = "/getConfigResource",method = RequestMethod.POST)
-    public JsonResult getConfigResource(RequestParamEntity requestParamEntity) {
+    public JsonResult getConfigResource(Map<String,Object> map) {
+        RequestParamEntity requestParamEntity =new RequestParamEntity();
+        requestParamEntity.setDataId(map.get("dataId").toString());
+        requestParamEntity.setEnv(map.get("env").toString());
+        requestParamEntity.setApp_key(map.get("app_key").toString());
+        requestParamEntity.setSign(map.get("sign").toString());
         //获取命名空间以及accessKey和secretKey值
-        Map envMap = EnvUtil.getEnvConfig(requestParamEntity.getEnv());
+        Map envMap = EnvUtil.getEnvConfig(map.get("env").toString());
         //校验时间戳
-        String timestamp = requestParamEntity.getDate();
+        String timestamp = map.get("date").toString();
         boolean timeFlag = checkSignTime(timestamp);
+
         if(!timeFlag){
             return  new JsonResult(JsonCode.FAIL.val(),JsonCode.FAIL.msg(),null);
         }
