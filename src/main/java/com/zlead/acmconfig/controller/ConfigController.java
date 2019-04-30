@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,23 +45,25 @@ public class ConfigController {
     private HttpServletRequest request;
 
     @RequestMapping(value = "/getConfigResource",method = RequestMethod.POST)
-    public JsonResult getConfigResource(Map<String,Object> map) {
+    public JsonResult getConfigResource(@RequestBody Map<String,Object> map) {
         RequestParamEntity requestParamEntity =new RequestParamEntity();
         requestParamEntity.setDataId(map.get("dataId").toString());
         requestParamEntity.setEnv(map.get("env").toString());
-        requestParamEntity.setApp_key(map.get("app_key").toString());
+        String app_key=String.valueOf(map.get("app_key"));
+        requestParamEntity.setApp_key(app_key);
         requestParamEntity.setSign(map.get("sign").toString());
+        requestParamEntity.setDate(map.get("date").toString());
         //获取命名空间以及accessKey和secretKey值
-        Map envMap = EnvUtil.getEnvConfig(map.get("env").toString());
+        Map envMap = EnvUtil.getEnvConfig(requestParamEntity.getEnv());
         //校验时间戳
-        String timestamp = map.get("date").toString();
+        String timestamp = requestParamEntity.getDate();
         boolean timeFlag = checkSignTime(timestamp);
 
         if(!timeFlag){
             return  new JsonResult(JsonCode.FAIL.val(),JsonCode.FAIL.msg(),null);
         }
         //验证签名
-        requestParamEntity.setEnv(envMap.get("env").toString());
+        //requestParamEntity.setEnv(envMap.get("env").toString());
         boolean signFlag = validateSign(requestParamEntity);
         if(!signFlag){
             return  new JsonResult(JsonCode.FAIL.val(),JsonCode.FAIL.msg(),null);
