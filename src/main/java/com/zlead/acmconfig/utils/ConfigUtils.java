@@ -15,19 +15,25 @@ import com.zlead.acmconfig.result.JsonResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.Map;
 import java.util.Properties;
 
+@Component
 public class ConfigUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(ConfigController.class);
 
 
 
+    private static  String endpoint;
+
     @Value("${endpoint}")
-    private static String endpoint;
+    public void setEnv(String endpoint) {
+        ConfigUtils.endpoint = endpoint;
+    }
 
 
     public static JsonResult getConfigResource(@RequestBody Map<String,Object> map) {
