@@ -1,5 +1,8 @@
 package com.zlead.acmconfig.utils;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -22,8 +25,9 @@ public class EnvUtil {
         try {
             //获取配置文件properties
             Properties properties = new Properties();
-            properties.load(new InputStreamReader(Object.class.getResourceAsStream("/env.properties"),"UTF-8"));
+            properties.load(new InputStreamReader(new ClassPathResource("env.properties").getInputStream()));
             map.put("env", properties.getProperty(env));
+            map.put("app_key", properties.getProperty(env +".app_key"));
             map.put("accessKey", properties.getProperty(env + ".accessKey"));
             map.put("secretKey", properties.getProperty(env + ".secretKey"));
         }catch (UnsupportedEncodingException e){

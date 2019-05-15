@@ -1,15 +1,12 @@
-/**
- * @program: acm-config
- * @description:配置中心
- * @author: ytchen
- * @create: 2019-05-13 15:01
- **/
+
 package com.zlead.acmconfig.utils;
 
 import com.alibaba.edas.acm.ConfigService;
 import com.alibaba.edas.acm.exception.ConfigException;
+import com.taobao.diamond.utils.StringUtils;
 import com.zlead.acmconfig.controller.ConfigController;
 import com.zlead.acmconfig.entity.RequestParamEntity;
+import com.zlead.acmconfig.exception.ParameterNotFoundException;
 import com.zlead.acmconfig.result.JsonCode;
 import com.zlead.acmconfig.result.JsonResult;
 import org.slf4j.Logger;
@@ -18,9 +15,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
+
+/**
+ * @program: acm-config
+ * @description:配置中心
+ * @author: ytchen
+ * @create: 2019-05-13 15:01
+ **/
 @Component
 public class ConfigUtils {
 
@@ -41,11 +44,28 @@ public class ConfigUtils {
         RequestParamEntity requestParamEntity =new RequestParamEntity();
         requestParamEntity.setDataId(map.get("dataId").toString());
         requestParamEntity.setEnv(map.get("env").toString());
-        String app_key=String.valueOf(map.get("app_key"));
-        requestParamEntity.setApp_key(app_key);
-        requestParamEntity.setDate(map.get("date").toString());
+        requestParamEntity.setDate(String.valueOf(System.currentTimeMillis() / 1000));
         //获取命名空间以及accessKey和secretKey值
         Map envMap = EnvUtil.getEnvConfig(requestParamEntity.getEnv());
+        map.put("app_key",envMap.get("app_key"));
+        map.put("date",String.valueOf(System.currentTimeMillis() / 1000));
+        requestParamEntity.setApp_key(String.valueOf(envMap.get("app_key")));
+        requestParamEntity.setSign(comds.getval(map));
+//        map.put("sign",comds.getval(map));
+        //校验时间戳
+        String timestamp = requestParamEntity.getDate();
+        boolean timeFlag = comds.checkSignTime(timestamp);
+
+        if(!timeFlag){
+            return  new JsonResult(JsonCode.FAIL.val(),JsonCode.FAIL.msg(),null);
+        }
+        //验证签名
+        //requestParamEntity.setEnv(envMap.get("env").toString());
+        boolean signFlag = comds.validateSign(requestParamEntity);
+        if(!signFlag){
+            return  new JsonResult(JsonCode.FAIL.val(),JsonCode.FAIL.msg(),null);
+        }
+
         //验证通过之后
         try {
             Properties properties = new Properties();
@@ -102,8 +122,7 @@ public class ConfigUtils {
         jsonResult.setCode(JsonCode.FAIL.val());
         jsonResult.setInfo(JsonCode.FAIL.msg());
         return null;
-
-
     }
+
 
 }
