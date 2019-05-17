@@ -3,14 +3,9 @@ package com.zlead.acmconfig.utils;
 
 import com.alibaba.edas.acm.ConfigService;
 import com.alibaba.edas.acm.exception.ConfigException;
-import com.taobao.diamond.utils.StringUtils;
-import com.zlead.acmconfig.controller.ConfigController;
 import com.zlead.acmconfig.entity.RequestParamEntity;
-import com.zlead.acmconfig.exception.ParameterNotFoundException;
 import com.zlead.acmconfig.result.JsonCode;
 import com.zlead.acmconfig.result.JsonResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +22,7 @@ import java.util.*;
 @Component
 public class ConfigUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigController.class);
+//    private static final Logger logger = LoggerFactory.getLogger(ConfigController.class);
 
 
 
